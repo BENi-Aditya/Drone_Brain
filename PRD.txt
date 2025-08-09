@@ -1,0 +1,159 @@
+ Product Requirement Document (PRD): Horn-Bill
+
+ Project Overview
+Name: Horn-Bill  
+Purpose: An autonomous fixed-wing drone system designed to accelerate reforestation by precisely detecting gaps in forest canopies and deploying biodegradable seed pods, with compensation for wind conditions.
+
+ Vision
+Horn-Bill uses a Raspberry Pi–mounted camera and Roboflow’s vegetation-gvb0s model to segment vegetation in real-time. By inverting the segmentation, it identifies bare-soil zones suitable for planting.
+
+ Wind Compensation
+Before mission start, Horn-Bill prompts the operator to input wind speed and direction via a clock-style UI (or sensor data). A physics engine calculates seed drift based on wind vector, drop altitude, and seed mass (~10 g).
+
+ Seed Deployment Logic
+The system evaluates candidate drop points by:
+1. Confirming a circle of configurable radius (e.g., 1 m) around the computed drop coordinate is free of vegetation.
+2. Adjusting drop coordinates to compensate for wind drift.
+3. Requesting user confirmation before activating the servo-based hatch to release a seed pod.
+
+ Simulation Mode (MVP)
+On Mac, Horn-Bill runs end-to-end using static images or video:
+- Loads and inverts segmentation masks from sample media.
+- Simulates wind input via CLI or minimal GUI.
+- Computes drift-adjusted drop coordinates.
+- Logs drop events and awaits user command to “DROP” in the console.
+
+---
+
+ 1. Objectives & Goals
+- Autonomous Detection: Real-time identification of non-vegetation areas from live camera or simulated media.
+- Accurate Deployment: Physics-based calculation of seed drift and validation of clear zones.
+- User Interaction: Minimalist UI for wind input, drop confirmation, and manual overrides.
+- Hardware Agnostic MVP: Full simulation on Mac with seamless migration to Raspberry Pi + PiCam.
+
+---
+
+ 2. Key Features
+
+ 2.1 Vegetation Segmentation
+- Integrate Roboflow vegetation-gvb0s segmentation model.  
+- Perform mask inversion to isolate soil regions.  
+- Overlay vegetation and soil masks on live feed for user clarity.
+
+ 2.2 Wind Input & Clock-Style UI
+- UI: Compact circular widget or CLI prompt to set wind direction (0–360°) and speed (m/s).  
+- Sensors: Placeholder for future integration of actual wind sensors.
+
+ 2.3 Drift Calculation Engine
+- Uses formula:
+  ```math
+  drop_time = sqrt(2  altitude / g)
+  drift_offset = wind_speed  drop_time
+
+Computes adjusted drop coordinates relative to drone’s GPS.
+
+2.4 Drop Zone Validation
+
+Define a clear radius (e.g., 1 m) around adjusted drop point.
+
+Verify inverted mask region entirely free of vegetation.
+
+Highlight valid drop point in overlay.
+
+2.5 Deployment Mechanism
+
+Servo Hatch: Controlled via Raspberry Pi GPIO.
+
+Opens hatch only after user confirmation and validation checks.
+
+2.6 Simulation Mode
+
+Input Modes: Static image, video file, or webcam feed on Mac.
+
+Output: Console logs “DROP at (x_pixel, y_pixel)” and visual markers on feed.
+
+User Prompt: CLI or GUI confirmation before logging a drop.
+
+3. Functional Requirements
+
+Frame Rate: ≥1 fps on Mac; target ≥0.5 fps on Pi.
+
+Segmentation API: Roboflow SDK integration with local inference.
+
+Mask Inverter: Reliable binary inversion of segmentation mask.
+
+Wind UI: Clock-style selector or CLI input for wind parameters.
+
+Drift Algorithm: Implement basic physics formula above.
+
+Validation Logic: Check clean zone within radius R in inverted mask.
+
+Ser­vo Control: GPIO trigger abstraction (simulate on Mac).
+
+Logging & Prompting: Display candidate zones, prompt “Drop? [Y/N]”, log events.
+
+4. Non-functional Requirements
+
+Portability: Modular code to switch between Mac simulation and Pi deployment.
+
+Performance: Lightweight dependencies; no GPU required.
+
+Usability: Intuitive prompts, clear overlays, minimal user actions.
+
+Maintainability: Well-documented modules for vision, physics, UI, hardware control.
+
+5. Architecture & Module Breakdown
+
++----------------------+        +------------------------+
+| Camera Input         |        |                        |
+| (PiCam / Image File) |------->| Vision Module         |
++----------------------+        | (Roboflow vegetation)  |
+                                 +-------+----------------+
+                                         |
+                                         v
+                                 +----------------+
+                                 | Mask Inverter  |
+                                 +--------+-------+
+                                          |
+                                          v
+                                +---------------------+
+                                | Drift Calculator    |
+                                | (wind & physics)    |
+                                +--------+------------+
+                                         |
+                                         v
+                                +---------------------+
+                                | Drop Validator      |
+                                +--------+------------+
+                                         |
+                                         v
+                                +---------------------+
+                                | UI & Simulation     |
+                                | (wind UI & console) |
+                                +---------------------+
+                                          |
+                                          v
+                                +---------------------+
+                                | Servo Controller    |
+                                | (GPIO / simulated)  |
+                                +---------------------+
+
+6. Immediate Next Steps (MVP Simulation on Mac)
+
+Env Setup: Install Python 3.x, OpenCV, Roboflow Python SDK.
+
+Sample Media: Gather/test with aerial forest images or short drone footage.
+
+Vision Script: Load vegetation-gvb0s model, segment vegetation, invert mask, display overlays.
+
+Wind Input Stub: Implement CLI prompt or simple Tkinter clock-angle selector.
+
+Physics Module: Code drift_offset calculation using altitude parameter.
+
+Validation & Prompt: Check clear radius in inverted mask, mark candidate, prompt "Drop? [Y/N]".
+
+Simulate Drop: On confirmation, print/log “DROPPED at (x, y)”.
+
+End-to-End Demo: Run full pipeline on sample video; verify UX and logs.
+
+Project Name: Horn-Bill

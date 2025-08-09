@@ -1,0 +1,20 @@
+# Raspberry Pi Requirements for Horn-Bill Drone Brain
+# Install with: pip install -r requirements_rpi.txt
+
+# Core dependencies
+opencv-python==4.8.1.78
+numpy==1.24.3
+requests==2.31.0
+
+# RPi Camera support (install system-wide on RPi)
+# Note: Install picamera2 via apt on Raspberry Pi:
+# sudo apt update
+# sudo apt install python3-picamera2
+
+# Optional: For better performance on RPi
+# Install these system packages on RPi:
+# sudo apt install python3-opencv
+# sudo apt install libatlas-base-dev
+# sudo apt install libjasper-dev
+# sudo apt install libqtgui4
+# sudo apt install libqt4-test
