@@ -1,0 +1,34 @@
+# Ignore large media files
+*.mov
+*.MOV
+*.mp4
+
+# Ignore Drone Videos directory
+/Drone Videos/
+/Demo_vid/
+/Media/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
