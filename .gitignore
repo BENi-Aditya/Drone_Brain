@@ -6,7 +6,7 @@
 # Ignore Drone Videos directory
 /Drone Videos/
 /Demo_vid/
-/Media/
+
 
 # Python
 __pycache__/
